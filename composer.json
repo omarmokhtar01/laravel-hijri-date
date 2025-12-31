@@ -1,0 +1,25 @@
+{
+  "name": "omarmokhtar/laravel-hijri-date",
+  "description": "Hijri & Gregorian date converter for Laravel",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "OmarMokhtar\\HijriDate\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^8.1",
+    "illuminate/support": "^10|^11|^12"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "OmarMokhtar\\HijriDate\\Providers\\HijriDateServiceProvider"
+      ],
+      "aliases": {
+        "HijriDate": "OmarMokhtar\\HijriDate\\Facades\\HijriDate"
+      }
+    }
+  }
+}
