@@ -12,16 +12,25 @@
 
   * `d-m-Y`
   * `d/m/Y`
+  * `Y-m-d`
+  * `Y/m/d`
+* ✅ Accepts Hijri dates as:
+
+  * `d/m/Y`
+  * `d-m-Y`
+  * `Y/m/d`
+  * `Y-m-d`
 * ✅ Accepts:
 
   * `string`
   * `Carbon`
   * `DateTime`
-* ✅ Timezone support
+  * `array` with keys: `day`, `month`, `year`
+* ✅ Timezone support for Gregorian dates
 * ✅ Uses reliable **Umm Al-Qura (via Aladhan API)**
 * ✅ Daily caching
 * ✅ Simple Facade API
-* ✅ Laravel 10 & 11 compatible
+* ✅ Laravel 10, 11 & 12 compatible
 
 ---
 
@@ -47,9 +56,9 @@ php artisan vendor:publish --tag=hijri-date-config
 
 ```php
 return [
-    'timezone'  => config('app.timezone'),
-    'adjustment' => 0, // -1 | 0 | +1
-    'cache_ttl' => 86400 // seconds (1 day)
+    'timezone'   => config('app.timezone'),
+    'adjustment' => 0,      // -1 | 0 | +1 (Hijri adjustment)
+    'cache_ttl'  => 86400   // seconds (1 day)
 ];
 ```
 
@@ -83,11 +92,13 @@ HijriDate::todayHijri();
 
 ### Convert Gregorian → Hijri
 
-#### String input (`d-m-Y` or `d/m/Y`)
+#### String input
 
 ```php
 HijriDate::fromGregorian('15-03-2025');
 HijriDate::fromGregorian('15/03/2025');
+HijriDate::fromGregorian('2025-03-15');
+HijriDate::fromGregorian('2025/03/15');
 ```
 
 #### With timezone
@@ -107,21 +118,29 @@ HijriDate::fromGregorian(new DateTime());
 
 ### Convert Hijri → Gregorian
 
+#### Individual day/month/year
+
 ```php
 HijriDate::fromHijri(1, 9, 1446);
 ```
 
-Output example:
+#### String input
 
 ```php
-[
-  "date" => "01-03-2025",
-  "month" => [
-      "number" => 3,
-      "en" => "March"
-  ],
-  "year" => "2025"
-]
+HijriDate::fromHijriString('13/08/1447');
+HijriDate::fromHijriString('13-08-1447');
+HijriDate::fromHijriString('1447/08/13');
+HijriDate::fromHijriString('1447-08-13');
+```
+
+#### Array input
+
+```php
+HijriDate::parse([
+    'day' => 1,
+    'month' => 9,
+    'year' => 1446,
+]);
 ```
 
 ---
@@ -129,14 +148,12 @@ Output example:
 ### Auto-detect & Parse
 
 ```php
-HijriDate::parse('15-03-2025');
-
-HijriDate::parse([
-    'day' => 1,
-    'month' => 9,
-    'year' => 1446,
-]);
+HijriDate::parse('15-03-2025');          // Gregorian
+HijriDate::parse('13/08/1447', 'hijri'); // Hijri
+HijriDate::parse('1447/08/13', 'hijri'); // Hijri (YYYY/MM/DD)
 ```
+
+The package will automatically detect whether the date is **Hijri or Gregorian** based on the year value or optional type hint (`'hijri'`).
 
 ---
 
@@ -162,7 +179,7 @@ OmarMokhtar\HijriDate\Exceptions\InvalidDateException
 ## 🧪 Requirements
 
 * PHP ^8.1
-* Laravel ^10 | ^11
+* Laravel ^10 | ^11 | ^12
 * Internet connection (API-based)
 
 ---
