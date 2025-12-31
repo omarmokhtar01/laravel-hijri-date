@@ -1,34 +1,36 @@
-
 # 🕌 Laravel Hijri Date
 
-> A lightweight and powerful Laravel package to convert **Hijri ⇄ Gregorian** dates with automatic detection, multiple formats support, and offline calculations.
+> A clean and powerful Laravel package for handling **Hijri & Gregorian dates** with automatic detection, flexible input formats, and reliable conversion using Umm Al-Qura calendar.
 
 ---
 
 ## ✨ Features
 
 * ✅ Convert **Gregorian ⇄ Hijri**
+* ✅ Auto-detect input type
+* ✅ Accepts Gregorian dates as:
 
-* ✅ Auto-detect date type (Hijri or Gregorian)
+  * `d-m-Y`
+  * `d/m/Y`
+  * `Y-m-d`
+  * `Y/m/d`
+* ✅ Accepts Hijri dates as:
 
-* ✅ Accepts multiple formats:
+  * `d/m/Y`
+  * `d-m-Y`
+  * `Y/m/d`
+  * `Y-m-d`
+* ✅ Accepts:
 
-  * Gregorian: `d-m-Y`, `d/m/Y`, `Y-m-d`, `Y/m/d`
-  * Hijri: `d/m/Y`, `d-m-Y`, `Y/m/d`, `Y-m-d`
-  * Also supports `array` input: `['day' => , 'month' => , 'year' => ]`
-  * Carbon / DateTime objects
-
+  * `string`
+  * `Carbon`
+  * `DateTime`
+  * `array` with keys: `day`, `month`, `year`
 * ✅ Timezone support for Gregorian dates
-
-* ✅ Uses internal **Umm Al-Qura** calculations
-
-* ✅ Optional daily validation against external sources
-
-* ✅ Daily caching for performance
-
-* ✅ Cron Job support for validation
-
-* ✅ Laravel 10, 11 & 12 ready
+* ✅ Uses reliable **Umm Al-Qura (via Aladhan API)**
+* ✅ Daily caching
+* ✅ Simple Facade API
+* ✅ Laravel 10, 11 & 12 compatible
 
 ---
 
@@ -38,7 +40,7 @@
 composer require omarmokhtar/laravel-hijri-date
 ```
 
-Laravel auto-discovers the service provider.
+Laravel will auto-discover the service provider.
 
 ---
 
@@ -54,10 +56,9 @@ php artisan vendor:publish --tag=hijri-date-config
 
 ```php
 return [
-    'timezone'        => config('app.timezone'),
-    'adjustment'      => 0,      // Hijri adjustment: -1 | 0 | +1
-    'cache_ttl'       => 86400,  // 1 day
-    'validate_daily'  => true,   // optional daily validation
+    'timezone'   => config('app.timezone'),
+    'adjustment' => 0,      // -1 | 0 | +1 (Hijri adjustment)
+    'cache_ttl'  => 86400   // seconds (1 day)
 ];
 ```
 
@@ -65,35 +66,109 @@ return [
 
 ## 🚀 Usage
 
+### Get today Hijri date
+
 ```php
 use HijriDate;
 
-// Today Hijri
 HijriDate::todayHijri();
+```
 
-// Gregorian → Hijri
+**Output example:**
+
+```php
+[
+  "day" => "10",
+  "month" => [
+      "number" => 9,
+      "en" => "Ramadan",
+      "ar" => "رمضان"
+  ],
+  "year" => "1446"
+]
+```
+
+---
+
+### Convert Gregorian → Hijri
+
+#### String input
+
+```php
+HijriDate::fromGregorian('15-03-2025');
 HijriDate::fromGregorian('15/03/2025');
-HijriDate::fromGregorian(now(), 'Africa/Cairo');
+HijriDate::fromGregorian('2025-03-15');
+HijriDate::fromGregorian('2025/03/15');
+```
 
-// Hijri → Gregorian
+#### With timezone
+
+```php
+HijriDate::fromGregorian('15/03/2025', 'Africa/Cairo');
+```
+
+#### Carbon / DateTime
+
+```php
+HijriDate::fromGregorian(now());
+HijriDate::fromGregorian(new DateTime());
+```
+
+---
+
+### Convert Hijri → Gregorian
+
+#### Individual day/month/year
+
+```php
 HijriDate::fromHijri(1, 9, 1446);
+```
+
+#### String input
+
+```php
 HijriDate::fromHijriString('13/08/1447');
+HijriDate::fromHijriString('13-08-1447');
+HijriDate::fromHijriString('1447/08/13');
+HijriDate::fromHijriString('1447-08-13');
+```
+
+#### Array input
+
+```php
 HijriDate::parse([
     'day' => 1,
     'month' => 9,
     'year' => 1446,
 ]);
-
-// Auto-detect
-HijriDate::parse('15-03-2025');          // Gregorian
-HijriDate::parse('13/08/1447', 'hijri'); // Hijri
 ```
 
 ---
 
-## 📄 Error Handling
+### Auto-detect & Parse
 
-Invalid input will throw:
+```php
+HijriDate::parse('15-03-2025');          // Gregorian
+HijriDate::parse('13/08/1447', 'hijri'); // Hijri
+HijriDate::parse('1447/08/13', 'hijri'); // Hijri (YYYY/MM/DD)
+```
+
+The package will automatically detect whether the date is **Hijri or Gregorian** based on the year value or optional type hint (`'hijri'`).
+
+---
+
+## 🧠 How It Works
+
+* Gregorian parsing handled via **Carbon**
+* Hijri conversion using **Aladhan API**
+* Calendar based on **Umm Al-Qura**
+* Results cached daily for performance
+
+---
+
+## ❌ Error Handling
+
+Invalid or unsupported input will throw:
 
 ```php
 OmarMokhtar\HijriDate\Exceptions\InvalidDateException
@@ -105,18 +180,24 @@ OmarMokhtar\HijriDate\Exceptions\InvalidDateException
 
 * PHP ^8.1
 * Laravel ^10 | ^11 | ^12
+* Internet connection (API-based)
 
 ---
 
-## 🔒 Independence
+## 🔒 Offline Mode (Planned)
 
-* Internal Hijri calculations → no mandatory external API
-* Optional external validation to guarantee correctness
-* Cron Job ensures daily validation and cache refresh
+Upcoming features:
+
+* ⏳ Offline astronomical calculations
+* ⏳ Carbon macro (`now()->toHijri()`)
+* ⏳ Validation Rule (`hijri_date`)
+* ⏳ Multi-calendar support
 
 ---
 
 ## 🤝 Contributing
+
+Contributions are welcome!
 
 1. Fork the repo
 2. Create a new branch
@@ -127,4 +208,5 @@ OmarMokhtar\HijriDate\Exceptions\InvalidDateException
 
 ## 📄 License
 
-MIT © 2026 — Developed by **Omar Mokhtar**
+MIT License © 2026
+Developed by **Omar Mokhtar**
