@@ -1,6 +1,6 @@
 # 🕌 Laravel Hijri Date
 
-> A clean and powerful Laravel package for handling **Hijri & Gregorian dates** with automatic detection, flexible input formats, and reliable conversion using Umm Al-Qura calendar.
+> A clean and powerful Laravel package for handling **Hijri & Gregorian dates** with automatic detection, flexible input formats, and reliable conversion using the **Umm Al-Qura calendar**.
 
 ---
 
@@ -20,45 +20,48 @@
   * `d-m-Y`
   * `Y/m/d`
   * `Y-m-d`
-* ✅ Accepts:
+* ✅ Accepts input as:
 
   * `string`
   * `Carbon`
   * `DateTime`
   * `array` with keys: `day`, `month`, `year`
 * ✅ Timezone support for Gregorian dates
-* ✅ Uses reliable **Umm Al-Qura (via Aladhan API)**
-* ✅ Daily caching
+* ✅ Uses reliable **Umm Al-Qura calendar (via Aladhan API)**
+* ✅ Daily caching for performance
 * ✅ Simple Facade API
-* ✅ Laravel 10, 11 & 12 compatible
+* ✅ Console command support
+* ✅ Laravel **10, 11 & 12** compatible
 
 ---
 
 ## 📦 Installation
 
+Install via Composer:
+
 ```bash
 composer require omarmokhtar/laravel-hijri-date
 ```
 
-Laravel will auto-discover the service provider.
+Laravel will auto-discover the service provider automatically.
 
 ---
 
 ## ⚙️ Configuration
 
-Publish the config file:
+Publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag=hijri-date-config
 ```
 
-`config/hijri-date.php`:
+### `config/hijri-date.php`
 
 ```php
 return [
     'timezone'   => config('app.timezone'),
-    'adjustment' => 0,      // -1 | 0 | +1 (Hijri adjustment)
-    'cache_ttl'  => 86400   // seconds (1 day)
+    'adjustment' => 0,        // -1 | 0 | +1 (Hijri day adjustment)
+    'cache_ttl'  => 86400     // seconds (1 day)
 ];
 ```
 
@@ -66,7 +69,7 @@ return [
 
 ## 🚀 Usage
 
-### Get today Hijri date
+### Get today's Hijri date
 
 ```php
 use HijriDate;
@@ -74,7 +77,7 @@ use HijriDate;
 HijriDate::todayHijri();
 ```
 
-**Output example:**
+**Example output:**
 
 ```php
 [
@@ -118,7 +121,7 @@ HijriDate::fromGregorian(new DateTime());
 
 ### Convert Hijri → Gregorian
 
-#### Individual day/month/year
+#### Using day, month, year
 
 ```php
 HijriDate::fromHijri(1, 9, 1446);
@@ -153,16 +156,67 @@ HijriDate::parse('13/08/1447', 'hijri'); // Hijri
 HijriDate::parse('1447/08/13', 'hijri'); // Hijri (YYYY/MM/DD)
 ```
 
-The package will automatically detect whether the date is **Hijri or Gregorian** based on the year value or optional type hint (`'hijri'`).
+The package will automatically detect whether the date is **Hijri or Gregorian** based on the year or optional type hint.
 
 ---
 
 ## 🧠 How It Works
 
 * Gregorian parsing handled via **Carbon**
-* Hijri conversion using **Aladhan API**
+* Hijri conversion handled via **Aladhan API**
 * Calendar based on **Umm Al-Qura**
-* Results cached daily for performance
+* Results cached daily for high performance
+
+---
+
+## 🖥️ Console Command
+
+This package provides a built-in Artisan command for validating Hijri date sources.
+
+### Run manually
+
+```bash
+php artisan hijri:validate
+```
+
+---
+
+## ⏱️ Scheduling the Command (Optional)
+
+You can run the Hijri validation command automatically every day using **Laravel Scheduler**.
+
+### 1️⃣ Add to `app/Console/Kernel.php`
+
+```php
+use Illuminate\Console\Scheduling\Schedule;
+
+protected function schedule(Schedule $schedule)
+{
+    $schedule->command('hijri:validate')->dailyAt('00:05');
+}
+```
+
+This will run the command **daily at 12:05 AM**.
+
+---
+
+### 2️⃣ Enable Scheduler on the Server
+
+Make sure you have this Cron Job configured on your server:
+
+```bash
+* * * * * php /path-to-your-project/artisan schedule:run >> /dev/null 2>&1
+```
+
+> ⚠️ Replace `/path-to-your-project` with the actual path to your Laravel project.
+
+---
+
+### ✅ Notes
+
+* Console commands are **auto-registered** via the package service provider
+* No console files are copied into your project
+* This is the **standard Laravel package behavior**
 
 ---
 
@@ -191,15 +245,15 @@ Upcoming features:
 * ⏳ Offline astronomical calculations
 * ⏳ Carbon macro (`now()->toHijri()`)
 * ⏳ Validation Rule (`hijri_date`)
-* ⏳ Multi-calendar support
+* ⏳ Multi-calendar support (Umm Al-Qura, Turkish, etc.)
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome!
+Contributions are welcome ❤️
 
-1. Fork the repo
+1. Fork the repository
 2. Create a new branch
 3. Commit your changes
 4. Open a Pull Request 🚀
@@ -208,5 +262,5 @@ Contributions are welcome!
 
 ## 📄 License
 
-MIT License © 2026
+MIT License © 2025
 Developed by **Omar Mokhtar**
