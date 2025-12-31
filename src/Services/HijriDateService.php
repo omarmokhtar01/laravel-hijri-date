@@ -74,10 +74,14 @@ class HijriDateService
         $parts = explode('/', $date);
 
         if (count($parts) !== 3) {
-            throw new \Exception("Invalid Hijri date format. Use d/m/Y or d-m-Y");
+            throw new \Exception("Invalid Hijri date format. Use DD/MM/YYYY or YYYY/MM/DD");
         }
 
-        [$day, $month, $year] = $parts;
+        if ((int)$parts[0] > 31) {
+            [$year, $month, $day] = $parts;
+        } else {
+            [$day, $month, $year] = $parts;
+        }
 
         return $this->fromHijri((int)$day, (int)$month, (int)$year);
     }
