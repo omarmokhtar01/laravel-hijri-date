@@ -44,8 +44,17 @@ class HijriDateService
             );
         }
 
+        if (preg_match('/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{3,4}$/', $date)) {
+            $parts = preg_split('/[\/\-]/', $date);
+            $year = (int)$parts[2];
+            if ($year > 1300) {
+                return $this->fromHijriString($date);
+            }
+        }
+
         return $this->fromGregorian($date, $timezone);
     }
+
     public function fromHijriString(string $date)
     {
         $date = str_replace('-', '/', $date);
