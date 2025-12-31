@@ -34,8 +34,20 @@ class HijriDateService
             ->hijriToGregorian($date);
     }
 
-    public function parse($date, ?string $timezone = null)
+    public function parse($date, ?string $type = null, ?string $timezone = null)
     {
+        if ($type === 'hijri') {
+            if (is_array($date)) {
+                return $this->fromHijri(
+                    $date['day'],
+                    $date['month'],
+                    $date['year']
+                );
+            }
+
+            return $this->fromHijriString($date);
+        }
+
         if (is_array($date)) {
             return $this->fromHijri(
                 $date['day'],
@@ -54,6 +66,7 @@ class HijriDateService
 
         return $this->fromGregorian($date, $timezone);
     }
+
 
     public function fromHijriString(string $date)
     {
