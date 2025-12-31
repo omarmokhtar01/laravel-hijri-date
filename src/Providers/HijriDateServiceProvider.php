@@ -3,6 +3,7 @@ namespace OmarMokhtar\HijriDate\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use OmarMokhtar\HijriDate\Services\HijriDateService;
+use OmarMokhtar\HijriDate\Console\ValidateHijriCommand;
 
 class HijriDateServiceProvider extends ServiceProvider
 {
@@ -14,6 +15,10 @@ class HijriDateServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(HijriDateService::class);
+
+        $this->commands([
+            ValidateHijriCommand::class,
+        ]);
     }
 
     public function boot()
